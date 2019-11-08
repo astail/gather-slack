@@ -3,6 +3,7 @@ package net.astail
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import org.slf4j.{Logger, LoggerFactory}
+import slack.models.Message
 import slack.rtm.SlackRtmClient
 
 object Main {
@@ -11,37 +12,37 @@ object Main {
 
     logger.info("start app")
 
-    val token = ConfigFactory.load.getString("gether_times_oauth_access_token")
-    val botChannel = ConfigFactory.load.getString("gether_times_post_slack_channel")
+    val token = ConfigFactory.load.getString("gether_times_bot_user_oauth_access_token")
+
     implicit val system = ActorSystem("slack")
     implicit val ec = system.dispatcher
 
     val client = SlackRtmClient(token)
 
     client.onMessage { message =>
-      val channel: String = client.state.getChannelIdForName(botChannel).getOrElse("")
-      //val channel: String = message.channel
-      val userId = client.state.getUserById(message.user).map(_.id).getOrElse("")
-      val receiveMessage = message.text
-      val sendMessageOption = messageCheck(receiveMessage, userId)
-
-      sendMessageOption match {
-        case Some(sendMessage: String) =>
+      val sendMessageOption: Option[ResponseMessage] = messageCheck(message, client)
+      sendMessageOption.foreach {
+        response =>
           logger.info("================================================================")
-          logger.info(s"receiveMessage: $receiveMessage")
-          logger.info(s"sendMessage: $sendMessage")
+          logger.info(s"receiveMessage: ${message.text}")
+          logger.info(s"sendMessage: ${response.text}")
           logger.info("================================================================")
-          client.sendMessage(channel, sendMessage)
-        case None =>
+          client.sendMessage(response.channel, response.text)
       }
     }
   }
 
-  def messageCheck(message: String, userId: String): Option[String] = {
-    println(s"message: $message, userId: $userId")
-    message match {
-      case "ping" => Some(s"<@$userId> pong")
-      case _ => None
+
+  case class ResponseMessage(text: String, channel: String)
+
+  def messageCheck(message: Message, client: SlackRtmClient): Option[ResponseMessage] = {
+    val botChannel = ConfigFactory.load.getString("gether_times_post_slack_channel")
+    val channel: String = client.state.getChannelIdForName(botChannel).getOrElse("")
+    val userName: String = client.state.getUserById(message.user).flatMap(_.profile.flatMap(_.first_name)).getOrElse("")
+
+    message.text match {
+      case "ping" => Some(ResponseMessage(s"<@${message.user}> pong", message.channel))
+      case _ => Some(ResponseMessage(s"${userName}: ${message.text}", channel))
     }
   }
 }
