@@ -38,12 +38,11 @@ object Main {
   def messageCheck(message: Message, client: SlackRtmClient): Option[ResponseMessage] = {
     val botChannel = ConfigFactory.load.getString("gether_times_post_slack_channel")
     val channel: String = client.state.getChannelIdForName(botChannel).getOrElse("")
-    val userName: String = client.state.getUserById(message.user).flatMap(_.profile.flatMap(_.first_name)).getOrElse("")
 
     if (message.channel != channel)
       message.text match {
         case "ping" => Some(ResponseMessage(s"<@${message.user}> pong", message.channel))
-        case _ => Some(ResponseMessage(s"${userName}: ${message.text}", channel))
+        case _ => Some(ResponseMessage(s"<#${message.channel}> / <@${message.user}>: ${message.text}", channel))
       }
     else
       None
