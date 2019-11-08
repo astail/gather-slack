@@ -11,8 +11,8 @@ object Main {
 
     logger.info("start app")
 
-    val token = ConfigFactory.load.getString("slack_token")
-    val botChannel = ConfigFactory.load.getString("slack_channel")
+    val token = ConfigFactory.load.getString("gether_times_oauth_access_token")
+    val botChannel = ConfigFactory.load.getString("gether_times_post_slack_channel")
     implicit val system = ActorSystem("slack")
     implicit val ec = system.dispatcher
 
