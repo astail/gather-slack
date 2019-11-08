@@ -40,9 +40,12 @@ object Main {
     val channel: String = client.state.getChannelIdForName(botChannel).getOrElse("")
     val userName: String = client.state.getUserById(message.user).flatMap(_.profile.flatMap(_.first_name)).getOrElse("")
 
-    message.text match {
-      case "ping" => Some(ResponseMessage(s"<@${message.user}> pong", message.channel))
-      case _ => Some(ResponseMessage(s"${userName}: ${message.text}", channel))
-    }
+    if (message.channel != channel)
+      message.text match {
+        case "ping" => Some(ResponseMessage(s"<@${message.user}> pong", message.channel))
+        case _ => Some(ResponseMessage(s"${userName}: ${message.text}", channel))
+      }
+    else
+      None
   }
 }
