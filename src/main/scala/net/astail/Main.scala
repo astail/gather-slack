@@ -38,7 +38,11 @@ object Main {
 
   def messageCheck(message: Message, client: SlackRtmClient): Option[ResponseMessage] = {
     val botChannel = ConfigFactory.load.getString("gether_times_post_slack_channel")
-    val channel: String = client.state.getChannelIdForName(botChannel).getOrElse("")
+
+    val channel = if (s"${botChannel.head}" == "#")
+      client.state.getChannelIdForName(botChannel.tail).getOrElse("")
+    else
+      botChannel
 
     // 自分のIDを設定して自分以外は反応しないようにする
     val myUserId: String = "U054X0P0V"
