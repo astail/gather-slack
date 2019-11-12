@@ -1,6 +1,6 @@
 organization := "net.astail"
 
-name := "gather-times"
+name := "gather-slack"
 
 version := "0.1.0-SNAPSHOT"
 
