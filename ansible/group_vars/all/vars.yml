@@ -1,0 +1,4 @@
+---
+
+gether_slack_bot_user_oauth_access_token: "{{ vault_gether_slack_bot_user_oauth_access_token }}"
+gether_slack_post_slack_channel: "{{ vault_gether_slack_post_slack_channel }}"

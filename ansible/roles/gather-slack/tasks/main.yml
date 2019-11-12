@@ -1,0 +1,82 @@
+---
+
+- name: install unzip
+  yum:
+    name: unzip
+
+- name: mkdir gather-slack
+  file:
+    path: "{{ item }}/gather-slack"
+    owner: root
+    group: root
+    state: directory
+  with_items:
+    - /opt
+    - /etc
+    - /var/log
+    - /var/run
+
+- name: copy /etc/tmpfiles.d/gather-slack.conf
+  copy:
+    src: tmpfiles_d_gather-slack.conf
+    dest: /etc/tmpfiles.d/gather-slack.conf
+
+- name: copy /etc/systemd/system/gather-slack
+  copy:
+    src: gather-slack.service
+    dest: /etc/systemd/system/gather-slack.service
+    owner: root
+    mode: 0644
+
+- name: systemctl daemon reload
+  systemd:
+    name: gather-slack
+    daemon_reload: yes
+
+- name: copy gather-slack-0.1.0-SNAPSHOT.zip
+  copy:
+    src: gather-slack-0.1.0-SNAPSHOT.zip
+    dest: /opt/gather-slack/gather-slack-0.1.0-SNAPSHOT.zip
+
+- name: delete old directory
+  file:
+    path: /opt/gather-slack/gather-slack-0.1.0-SNAPSHOT
+    state: absent
+
+- name: unzip gather-slack
+  unarchive:
+    remote_src: yes
+    src: /opt/gather-slack/gather-slack-0.1.0-SNAPSHOT.zip
+    dest: /opt/gather-slack
+
+- name: copy application.conf
+  template:
+    src: application.conf
+    dest: /etc/gather-slack/application.conf
+    owner: root
+    group: root
+
+- name: copy logback.xml
+  copy:
+    src: logback.xml
+    dest: /etc/gather-slack/logback.xml
+    owner: root
+    group: root
+
+- name: gather-slack stop
+  systemd:
+    name: gather-slack
+    state: stopped
+
+- name: gather-slack start
+  systemd:
+    name: gather-slack
+    state: started
+
+- name: cron gather-slack restart
+  cron:
+    name: "gather-slack restart"
+    minute: "0"
+    hour: "4"
+    job: "systemctl restart gather-slack"
+    user: "root"
