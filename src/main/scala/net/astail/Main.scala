@@ -12,7 +12,7 @@ object Main {
 
     logger.info("start app")
 
-    val token = ConfigFactory.load.getString("gether_times_bot_user_oauth_access_token")
+    val token = ConfigFactory.load.getString("gether_slack_bot_user_oauth_access_token")
 
     implicit val system = ActorSystem("slack")
     implicit val ec = system.dispatcher
@@ -37,7 +37,7 @@ object Main {
   case class libraryMessage(channel: String, userId: String)
 
   def messageCheck(message: Message, client: SlackRtmClient): Option[ResponseMessage] = {
-    val botChannel = ConfigFactory.load.getString("gether_times_post_slack_channel")
+    val botChannel = ConfigFactory.load.getString("gether_slack_post_slack_channel")
 
     val channel = if (s"${botChannel.head}" == "#")
       client.state.getChannelIdForName(botChannel.tail).getOrElse("")
