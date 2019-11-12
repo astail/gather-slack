@@ -1,0 +1,6 @@
+---
+
+- hosts: gather-slack
+  become: yes
+  roles:
+    - gather-slack
