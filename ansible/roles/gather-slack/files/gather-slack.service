@@ -8,9 +8,8 @@ WorkingDirectory=/opt/gather-slack/gather-slack-0.1.0-SNAPSHOT
 Environment='JAVA_OPTS=-Xms128M -Xmx128M -XX:MaxMetaspaceSize=128M \
 -verbose:gc -Xloggc:/var/log/gather-slack/gc.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps \
 -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=10M'
-EnvironmentFile=/root/.bashrc
 PIDFile=/var/run/gather-slack/gather-slack.pid
-ExecStart=/bin/sh -c "exec /opt/gather-slack/gather-slack-0.1.0-SNAPSHOT/bin/gather-slack -Dpidfile.path=/var/run/gather-slack/gather-slack.pid -Dhttp.port=127.0.0.1 -Dhttp.port=9000 -Dconfig.file=/etc/gather-slack/application.conf -Dlogback.configurationFile=/etc/gather-slack/logback.xml >> /var/log/gather-slack/console.log 2>&1"
+ExecStart=/bin/sh -c "sleep 20s; exec /opt/gather-slack/gather-slack-0.1.0-SNAPSHOT/bin/gather-slack -Dpidfile.path=/var/run/gather-slack/gather-slack.pid -Dhttp.port=127.0.0.1 -Dhttp.port=9000 -Dconfig.file=/etc/gather-slack/application.conf -Dlogback.configurationFile=/etc/gather-slack/logback.xml >> /var/log/gather-slack/console.log 2>&1"
 ExecStop=/usr/bin/kill -QUIT $MAINPID
 ExecReload=/bin/kill -USR2 $MAINPID
 
