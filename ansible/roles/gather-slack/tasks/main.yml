@@ -72,6 +72,7 @@
   systemd:
     name: gather-slack
     state: started
+    enabled: yes
 
 - name: cron gather-slack restart
   cron:
